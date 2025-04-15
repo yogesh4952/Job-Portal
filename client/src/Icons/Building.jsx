@@ -1,0 +1,111 @@
+import React from "react";
+
+const Building = () => {
+  return (
+    <div className="bg-[#309689] p-2 rounded-full w-10 h-10 flex justify-center items-center">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 28 28"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clipPath="url(#clip0_25_7052)">
+          <mask
+            id="mask0_25_7052"
+            style={{ maskType: "luminance" }}
+            maskUnits="userSpaceOnUse"
+            x="0"
+            y="0"
+            width="28"
+            height="28"
+          >
+            <path d="M28 0H0V28H28V0Z" fill="white" />
+          </mask>
+          <g mask="url(#mask0_25_7052)">
+            <mask
+              id="mask1_25_7052"
+              style={{ maskType: "luminance" }}
+              maskUnits="userSpaceOnUse"
+              x="0"
+              y="0"
+              width="28"
+              height="28"
+            >
+              <path d="M0 1.90735e-06H28V28H0V1.90735e-06Z" fill="white" />
+            </mask>
+            <g mask="url(#mask1_25_7052)">
+              <path
+                d="M27.1797 27.1797H0.820312V25.5877C0.820312 24.0559 2.06205 22.8142 3.59384 22.8142H24.4062C25.938 22.8142 27.1797 24.0559 27.1797 25.5877V27.1797Z"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M11.5432 5.74214V0.820267H24.3765V22.8142H11.5432"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M3.62347 5.83336H16.4568V22.8143H3.62347V5.83336Z"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M7.99854 9.58423V13.0842"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M12.0818 9.58423V13.0842"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M7.99854 15.7821V19.2821"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M12.0818 15.7821V19.2821"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M20.0015 9.58423V13.0842"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M20.0015 15.7821V19.2821"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+              <path
+                d="M20.0015 3.38635V6.88635"
+                stroke="white"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+              />
+            </g>
+          </g>
+        </g>
+        <defs>
+          <clipPath id="clip0_25_7052">
+            <rect width="28" height="28" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+};
+
+export default Building;
