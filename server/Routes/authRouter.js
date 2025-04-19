@@ -1,9 +1,10 @@
-import { Router } from "express";
-import { googleLogin } from "../Controller/User/authController.js";
+import express from 'express';
+import { googleLogin, signup, login, verifyToken } from '../Controller/User/authController.js';
 
-const router = Router();
-
-
-router.get("/google", googleLogin)
+const router = express.Router();
+router.post('/google', googleLogin);
+router.post('/signup', signup);
+router.post('/login', login);
+router.get('/verify', verifyToken);
 
 export default router;

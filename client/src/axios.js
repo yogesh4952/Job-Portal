@@ -5,5 +5,5 @@ const api = axios.create({
 
 })
 
-const googleAuth = async (code) => api.get(`/google?code=${code}`)
+const googleAuth = async (code) => api.post(`/google`, { code })
 export default googleAuth
