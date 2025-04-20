@@ -28,6 +28,13 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+
+      'react/prop-types': 'off',
+      'react/jsx-filename-extension': [
+        'error',
+        { extensions: ['.jsx', '.js'] },
+      ],
+
     },
   },
 ]

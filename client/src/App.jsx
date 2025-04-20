@@ -8,6 +8,7 @@ import Contact from "./pages/Contact";
 import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import UserLogin from "./pages/UserLogin";
 
 const App = () => {
   const GoogleAuthWrapper = () => {
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/login" element={<GoogleAuthWrapper />} />
+        <Route path="/userlogin" element={<UserLogin />} />
         <Route path="*" element={<h1>404 Not Found</h1>} />
       </Routes>
     </>
