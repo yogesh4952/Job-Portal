@@ -1,36 +1,18 @@
 import React from "react";
 import "./App.css";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Navbar from "./Components/Navbar";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Jobs from "./pages/Jobs";
-import Login from "./pages/Login";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import UserLogin from "./pages/UserLogin";
-
+import ApplyJob from "./pages/ApplyJob";
+import Applications from "./pages/Applications";
 const App = () => {
-  const GoogleAuthWrapper = () => {
-    return (
-      <GoogleOAuthProvider clientId="614432948443-jq41o1f0ngj0tm7kprq8sd828k7d9h5a.apps.googleusercontent.com">
-        <Login />
-      </GoogleOAuthProvider>
-    );
-  };
   return (
-    <>
-      <Navbar />
+    <div>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/jobs" element={<Jobs />} />
-        <Route path="/login" element={<GoogleAuthWrapper />} />
-        <Route path="/userlogin" element={<UserLogin />} />
-        <Route path="*" element={<h1>404 Not Found</h1>} />
+        <Route path="/apply-job/:id" element={<ApplyJob />} />
+        <Route path="/applications" element={<Applications />} />
       </Routes>
-    </>
+    </div>
   );
 };
 
