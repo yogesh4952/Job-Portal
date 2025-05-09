@@ -58,8 +58,6 @@ const JobListing = () => {
           matchesSearchLocation(job)
       );
 
-    console.log(newFilteredJobs);
-
     setFilteredJobs(newFilteredJobs);
     setCurrentPage(1);
   }, [jobs, selectedCategories, selectedLocations, searchFilter]);
@@ -178,7 +176,7 @@ const JobListing = () => {
 
             {Array.from({ length: Math.ceil(filteredJobs.length / 6) }).map(
               (_, index) => (
-                <a href="#job-list">
+                <a href="#job-list" key={index}>
                   <button
                     onClick={() => setCurrentPage(index + 1)}
                     className={`w-10 h-10 flex items-center justify-center border border-gray-300 rounded ${

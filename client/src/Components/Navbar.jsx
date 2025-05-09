@@ -1,20 +1,25 @@
-import React from "react";
 import { assets } from "../assets/assets";
 import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
 
-  console.log(user);
+  const navigate = useNavigate();
+
   return (
     <div
       className="shadow py-4
     "
     >
       <div className=" container px-4 2xl:px-20 mx-auto flex justify-between items-center">
-        <img src={assets.logo} alt="Error" />
+        <img
+          onClick={() => navigate("/")}
+          className="cursor-pointer"
+          src={assets.logo}
+          alt="Error"
+        />
 
         {user ? (
           <div className="flex items-center gap-3">
