@@ -10,6 +10,7 @@ const Navbar = () => {
 
   const navigate = useNavigate();
 
+  console.log(user);
   const { setShowRecruiterLogin } = useContext(AppContext);
 
   return (

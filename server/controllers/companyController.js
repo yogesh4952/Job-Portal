@@ -5,6 +5,8 @@ import { v2 as cloudinary } from "cloudinary";
 import Job from "../models/Job.js";
 import { extractQueryParamsFromUrl } from "@sentry/core";
 
+import JobApplication from "../models/JobApplication.js";
+
 // Register a new company
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
@@ -158,11 +160,18 @@ export const getCompanyPostedJobs = async (req, res) => {
 
     const jobs = await Job.find({ companyId });
 
-    //(TODO): Adding no.of job applicant INFO IN data
+    // Adding no.of job applicant INFO IN data
+
+    const jobsData = await Promise.all(
+      jobs.map(async (job) => {
+        const applicants = await JobApplication.find({ jobId: job._id });
+        return { ...job.toObject(), applicants: applicants.length };
+      })
+    );
 
     res.json({
       success: true,
-      jobs,
+      jobsData,
     });
   } catch (error) {
     res.json({
