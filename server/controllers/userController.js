@@ -1,15 +1,16 @@
-import { flush } from "@sentry/node";
 import Job from "../models/Job.js";
 import JobApplication from "../models/JobApplication.js";
 import User from "../models/User.js";
 import { v2 as cloudinary } from "cloudinary";
+import mongoose from "mongoose";
 
 // Get user data
 export const getUserData = async (req, res) => {
-  const userId = req.auth.userId;
+  // const userId = req.auth.userId;
+  const { userId } = req.headers;
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findOne(userId);
 
     if (!user) {
       return res.json({
@@ -30,39 +31,55 @@ export const getUserData = async (req, res) => {
   }
 };
 
-// Apply for a job
 export const applyForJob = async (req, res) => {
   const { jobId } = req.body;
   const userId = req.auth.userId;
 
+  // Validate jobId
+  if (!jobId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Job ID is required" });
+  }
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    return res.status(400).json({ success: false, message: "Invalid Job ID" });
+  }
+
   try {
-    const isAlreadyApplied = await JobApplication.find({ jobId, userId });
-
-    if (isAlreadyApplied.length > 0) {
-      return res.json({ success: false, message: "Already Applied" });
+    // Check if user has already applied
+    const alreadyApplied = await JobApplication.findOne({ jobId, userId });
+    if (alreadyApplied) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already applied for this job.",
+      });
     }
 
-    const jobData = await Job.findById(jobId);
-
+    // Find job by _id
+    const jobData = await Job.findOne({ _id: jobId });
     if (!jobData) {
-      return res.json({ success: false, message: "Job Not Found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Job not found." });
     }
 
+    // Create job application
     await JobApplication.create({
-      comapnyId: jobData.companyId,
+      companyId: jobData.companyId,
       userId,
       jobId,
-      date: Date.now(),
+      date: new Date(),
     });
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Applied Successfully",
+      message: "Applied successfully.",
     });
   } catch (error) {
-    res.json({
+    console.error("Apply Job Error:", error);
+    res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Server error",
     });
   }
 };
@@ -101,7 +118,7 @@ export const updateUserResume = async (req, res) => {
   try {
     const userId = req.auth.userId;
 
-    const resumeFile = req.resumeFile;
+    const resumeFile = req.file;
 
     const userData = await User.findById(userId);
 

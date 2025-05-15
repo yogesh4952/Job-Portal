@@ -7,7 +7,7 @@ const JobApplicationSchema = new mongoose.Schema({
     required: true,
   },
 
-  comapnyId: {
+  companyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
     required: true,
