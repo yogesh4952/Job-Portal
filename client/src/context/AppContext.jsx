@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useAuth, useUser } from "@clerk/clerk-react";
 
 export const AppContext = createContext();
-
 export const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { user } = useUser();
@@ -14,25 +13,18 @@ export const AppContextProvider = (props) => {
     title: "",
     location: "",
   });
-
   const [isSearched, setIsSearched] = useState(false);
-
   const [jobs, setJobs] = useState([]);
-
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
-
   const [companyToken, setCompanyToken] = useState(null);
-
   const [companyData, setCompanyData] = useState(null);
-
   const [userData, setUserData] = useState(null);
   const [userApplications, setUserApplications] = useState([]);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false); // New loading state
 
-  // Function to fetch job data
   const fetchJobs = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/jobs");
-
       if (data.success) {
         setJobs(data.jobs);
       } else {
@@ -43,8 +35,6 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  // Function to fetch Company Data
-
   const fetchCompanyData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/company", {
@@ -52,7 +42,6 @@ export const AppContextProvider = (props) => {
           token: companyToken,
         },
       });
-
       if (data.success) {
         setCompanyData(data.company);
       } else {
@@ -63,29 +52,34 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  // Function to fetch user data
   const fetchUserData = async () => {
     try {
+      setIsLoadingUserData(true);
       const token = await getToken();
       const { data } = await axios.get(backendUrl + "/api/users/user", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log(data);
-
+      console.log("fetchUserData response:", data); // Debug log
       if (data.success) {
-        setUserData(data.user);
+        if (data.user) {
+          setUserData(data.user);
+        } else {
+          console.error("No user data returned:", data);
+          toast.error("No user data found.");
+        }
       } else {
+        console.error("fetchUserData failed:", data.message);
         toast.error(data.message);
       }
     } catch (error) {
+      console.error("fetchUserData error:", error);
       toast.error(error.message);
+    } finally {
+      setIsLoadingUserData(false);
     }
   };
-
-  // Function  to fetch usr's applied applicatio data
 
   const fetchUserApplications = async () => {
     try {
@@ -95,7 +89,6 @@ export const AppContextProvider = (props) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (data.success) {
         toast.success(data.message);
         setUserApplications(data.applications);
@@ -109,9 +102,7 @@ export const AppContextProvider = (props) => {
 
   useEffect(() => {
     fetchJobs();
-
     const storedCompanyToken = localStorage.getItem("companyToken");
-
     if (storedCompanyToken) {
       setCompanyToken(storedCompanyToken);
     }
@@ -150,6 +141,7 @@ export const AppContextProvider = (props) => {
     userApplications,
     fetchUserData,
     fetchUserApplications,
+    isLoadingUserData, // Expose loading state
   };
 
   return (

@@ -11,22 +11,26 @@ export const clerkWebhooks = async (req, res) => {
       "svix-signature": req.headers["svix-signature"],
     };
 
-    const payload = req.body; // raw buffer
-    const evt = wh.verify(payload, headers); // returns verified + parsed data
+    // Ensure req.body is a raw string or buffer
+    const payload =
+      typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+    const evt = wh.verify(payload, headers);
 
     const { data, type } = evt;
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("📩 Clerk Webhook Event:", type);
-    }
+    console.log("📩 Clerk Webhook Event:", type, data.id);
 
     switch (type) {
       case "user.created": {
         const userData = {
           _id: data.id,
-          email: data.email_addresses[0].email_address,
-          name: `${data.first_name} ${data.last_name}`,
-          image: data.image_url,
+          email:
+            data.email_addresses?.[0]?.email_address ||
+            `user_${data.id}@example.com`,
+          name:
+            `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+            "Unknown User",
+          image: data.image_url || "",
           resume: "",
         };
 
@@ -34,25 +38,41 @@ export const clerkWebhooks = async (req, res) => {
         if (!existingUser) {
           await User.create(userData);
           console.log("✅ User created:", userData.email);
+        } else {
+          console.log("ℹ️ User already exists:", userData.email);
         }
         break;
       }
 
       case "user.updated": {
         const userData = {
-          email: data.email_addresses[0].email_address,
-          name: `${data.first_name} ${data.last_name}`,
-          image: data.image_url,
+          email:
+            data.email_addresses?.[0]?.email_address ||
+            `user_${data.id}@example.com`,
+          name:
+            `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+            "Unknown User",
+          image: data.image_url || "",
         };
 
-        await User.findByIdAndUpdate(data.id, userData);
-        console.log("🔄 User updated:", userData.email);
+        const updatedUser = await User.findByIdAndUpdate(data.id, userData, {
+          new: true,
+        });
+        if (updatedUser) {
+          console.log("🔄 User updated:", userData.email);
+        } else {
+          console.log("⚠️ User not found for update:", data.id);
+        }
         break;
       }
 
       case "user.deleted": {
-        await User.findByIdAndDelete(data.id);
-        console.log("❌ User deleted:", data.id);
+        const deletedUser = await User.findByIdAndDelete(data.id);
+        if (deletedUser) {
+          console.log("❌ User deleted:", data.id);
+        } else {
+          console.log("⚠️ User not found for deletion:", data.id);
+        }
         break;
       }
 

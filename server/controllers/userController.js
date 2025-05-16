@@ -114,27 +114,76 @@ export const getUserJobApplications = async (req, res) => {
 };
 
 // Update user profile (resume)
+
+import { Clerk } from "@clerk/clerk-sdk-node";
+
+const clerk = new Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
+
 export const updateUserResume = async (req, res) => {
   try {
-    const userId = req.auth.userId;
+    const userId = req.auth.userId; // Clerk user ID
+    console.log("Updating resume for userId:", userId);
 
     const resumeFile = req.file;
+    console.log("Resume file:", resumeFile);
 
-    const userData = await User.findById(userId);
+    // Find user by _id (Clerk user ID)
+    let userData = await User.findById(userId);
+    if (!userData) {
+      console.log("Creating new user for userId:", userId);
 
-    if (resumeFile) {
-      const resumeUpload = await cloudinary.uploader.upload(resumeFile.path);
-      userData.resume = resumeUpload.secure_url;
+      // Fetch user data from Clerk
+      const clerkUser = await clerk.users.getUser(userId);
+      if (!clerkUser) {
+        console.error("Clerk user not found:", userId);
+        return res.status(404).json({
+          success: false,
+          message: "Clerk user not found",
+        });
+      }
+
+      userData = new User({
+        _id: userId,
+        email:
+          clerkUser.emailAddresses?.[0]?.emailAddress ||
+          `user_${userId}@example.com`,
+        name:
+          `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() ||
+          "Unknown User",
+        image: clerkUser.imageUrl || "https://via.placeholder.com/150", // Use Clerk image or fallback
+        resume: "",
+      });
+      await userData.save();
+      console.log("New user created:", userData);
     }
 
+    if (!resumeFile) {
+      console.error("No resume file provided");
+      return res.status(400).json({
+        success: false,
+        message: "No resume file provided",
+      });
+    }
+
+    // Upload resume to Cloudinary
+    const resumeUpload = await cloudinary.uploader.upload(resumeFile.path, {
+      folder: "resumes",
+    });
+    console.log("Cloudinary upload result:", resumeUpload);
+
+    // Update user's resume field
+    userData.resume = resumeUpload.secure_url;
     await userData.save();
+
+    console.log("User updated successfully:", userData);
 
     return res.json({
       success: true,
-      message: "Resume Updated",
+      message: "Resume updated successfully",
     });
   } catch (error) {
-    res.json({
+    console.error("Error in updateUserResume:", error);
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
