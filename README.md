@@ -87,7 +87,9 @@ A full-stack Job Portal application designed to connect job seekers with employe
 
 ## Screenshot
 
-Dark Mode:
+light Mode: ![alt text](image.png)
+Dark Mode: ![alt text](image-1.png)
+Dashboard Panel: ![alt text](image-2.png)
 
 ## Deployment
 

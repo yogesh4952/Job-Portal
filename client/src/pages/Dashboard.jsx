@@ -44,12 +44,12 @@ const Dashboard = () => {
       {/* Navbar for recruiter panel */}
       <div className="shadow-sm py-4 bg-base-200">
         <div className="container px-5 mx-auto flex justify-between items-center">
-          <img
+          <h1
             onClick={() => navigate("/")}
-            className="max-sm:w-32 cursor-pointer"
-            src={assets.logo}
-            alt="Company Logo"
-          />
+            className="text-2xl sm:text-3xl md:text-4xl italic underline cursor-pointer font-extrabold"
+          >
+            <span className="text-secondary">yo</span>Gesh
+          </h1>
 
           {companyData && (
             <div className="flex items-center gap-3">

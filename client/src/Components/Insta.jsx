@@ -12,3 +12,4 @@ const Insta = ({ className }) => {
     </svg>
   );
 };
+export default Insta;
