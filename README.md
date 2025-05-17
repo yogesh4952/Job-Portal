@@ -85,6 +85,10 @@ A full-stack Job Portal application designed to connect job seekers with employe
 
    Open your browser and navigate to `http://localhost:5173` to use the Job Portal.
 
+## Screenshot
+
+Dark Mode:
+
 ## Deployment
 
 The application is deployed and accessible at: [job-portal-hazel-gamma.vercel.app](https://job-portal-hazel-gamma.vercel.app)
