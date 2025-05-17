@@ -4,8 +4,8 @@ import { assets } from "../assets/assets";
 const AppDownload = () => {
   return (
     <div className="container px-4 2xl:px-20 mx-auto my-20">
-      <div className="relative bg-gradient-to-r from-violet-50 to-purple-50 p-12 sm:p-24 lg:p-32 rounded-lg overflow-hidden">
-        <h1 className="text-2xl sm:text-4xl font-bold mb-8 max-w-md text-gray-900">
+      <div className="relative card bg-gradient-to-r from-primary/10 to-secondary/10 p-12 sm:p-24 lg:p-32 rounded-lg overflow-hidden shadow-md">
+        <h1 className="text-2xl sm:text-4xl font-bold mb-8 max-w-md text-base-content">
           Download Our Mobile App for a Better Experience
         </h1>
         <div className="flex gap-4">

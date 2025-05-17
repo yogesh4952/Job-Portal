@@ -7,9 +7,8 @@ import { assets } from "../assets/assets";
 import kconvert from "k-convert";
 import moment from "moment";
 import JobCard from "../components/JobCard";
-
 import Footer from "../components/Footer";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
 
@@ -39,12 +38,15 @@ const ApplyJob = () => {
         setJobData(data.job);
       } else {
         setIsLoading(false);
-        toast.error(data.message);
+        toast.error(data.message, {
+          theme: "colored",
+        });
       }
     } catch (error) {
       setIsLoading(false);
-
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
   };
 
@@ -53,19 +55,25 @@ const ApplyJob = () => {
 
     try {
       if (!userData) {
-        toast.error("Please log in to apply for jobs");
+        toast.error("Please log in to apply for jobs", {
+          theme: "colored",
+        });
         return;
       }
 
       if (!userData.resume) {
         navigate("/applications");
-        toast.error("Please upload a resume to apply");
+        toast.error("Please upload a resume to apply", {
+          theme: "colored",
+        });
         return;
       }
 
       const token = await getToken();
       if (!token) {
-        toast.error("Authentication failed. Please log in again.");
+        toast.error("Authentication failed. Please log in again.", {
+          theme: "colored",
+        });
         return;
       }
 
@@ -83,10 +91,21 @@ const ApplyJob = () => {
       );
 
       if (data.success) {
-        toast.success(data.message);
+        toast.success(data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         fetchUserApplications();
       } else {
-        toast.error(data.message);
+        toast.error(data.message, {
+          theme: "colored",
+        });
       }
       setIsLoading(false);
     } catch (error) {
@@ -97,7 +116,9 @@ const ApplyJob = () => {
         response: error.response?.data,
         status: error.response?.status,
       });
-      toast.error(error.response?.data?.message || "Failed to apply for job");
+      toast.error(error.response?.data?.message || "Failed to apply for job", {
+        theme: "colored",
+      });
     }
   };
 
@@ -122,78 +143,89 @@ const ApplyJob = () => {
   return jobData ? (
     <>
       <Navbar />
-
-      <div className="min-h-screen flex flex-col py-10 container px-4 2xl:px-20 mx-auto">
-        <div className="bg-white text-black rounded-lg w-full">
-          <div className="flex justify-center md:justify-between flex-wrap gap-8 px-14 py-20 mb-6 bg-sky-50 border border-sky-400 rounded-xl">
+      <div className="min-h-screen flex flex-col py-10 container px-4 2xl:px-20 mx-auto bg-base-100 text-base-content">
+        <div className="card bg-base-100 rounded-lg w-full shadow-md">
+          <div className="flex justify-center md:justify-between flex-wrap gap-8 px-4 sm:px-14 py-10 sm:py-20 mb-6 bg-primary/10 border border-primary/20 rounded-xl">
             <div className="flex flex-col md:flex-row items-center">
               <img
-                className="h-24 bg-white roundelg p-4 mr-4 max-md:mb-4 border"
+                className="h-24 bg-base-100 rounded-lg p-4 mr-4 max-md:mb-4 border border-base-200"
                 src={jobData.companyId.image}
-                alt="company_icon"
+                alt={`${jobData.companyId.name} logo`}
               />
-              <div className="text-center md:text-left text-neutral-700 ">
-                <h1 className="text-2xl sm:text-4xl font-medium">
+              <div className="text-center md:text-left">
+                <h1 className="text-2xl sm:text-4xl font-medium text-base-content">
                   {jobData.title}
                 </h1>
-
-                <div className="flex flex-row flex-wrap max-md:justify-center gap-y-2 gap-6 items-center text-gray-600 mt-2">
+                <div className="flex flex-row flex-wrap max-md:justify-center gap-y-2 gap-6 items-center text-base-content/80 mt-2">
                   <span className="flex items-center gap-1">
-                    <img src={assets.suitcase_icon} alt="" />
+                    <img
+                      src={assets.suitcase_icon}
+                      alt="Company"
+                      className="w-4 h-4"
+                    />
                     {jobData.companyId.name}
                   </span>
-
                   <span className="flex items-center gap-1">
-                    <img src={assets.location_icon} alt="" />
+                    <img
+                      src={assets.location_icon}
+                      alt="Location"
+                      className="w-4 h-4"
+                    />
                     {jobData.location}
                   </span>
-
                   <span className="flex items-center gap-1">
-                    <img src={assets.person_icon} alt="" />
+                    <img
+                      src={assets.person_icon}
+                      alt="Level"
+                      className="w-4 h-4"
+                    />
                     {jobData.level}
                   </span>
-
                   <span className="flex items-center gap-1">
-                    <img src={assets.money_icon} alt="" />
+                    <img
+                      src={assets.money_icon}
+                      alt="Salary"
+                      className="w-4 h-4"
+                    />
                     CTC: {kconvert.convertTo(jobData.salary)}
                   </span>
                 </div>
               </div>
             </div>
-
             <div className="flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center">
               <button
                 onClick={applyHandler}
-                className="bg-blue-600 p-2.5 px-10 text-white rounded disabled:bg-blue-300 "
+                className="btn btn-primary px-10 disabled:btn-disabled"
                 disabled={isLoading}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
               </button>
-              <p className="mt-1 text-gray-600">
+              <p className="mt-1 text-base-content/80">
                 Posted {moment(jobData.date).fromNow()}
               </p>
             </div>
           </div>
-
-          <div className="flex flex-col lg:flex-row justify-between items-start">
+          <div className="flex flex-col lg:flex-row justify-between items-start px-4 sm:px-0">
             <div className="w-full lg:w-2/3">
-              <h2 className="font-bold text-2xl mb-4">Job description</h2>
+              <h2 className="font-bold text-2xl mb-4 text-base-content">
+                Job Description
+              </h2>
               <div
-                className="rich-text"
+                className="rich-text text-base-content"
                 dangerouslySetInnerHTML={{ __html: jobData.description }}
               ></div>
               <button
                 onClick={applyHandler}
-                className="bg-blue-600 p-2.5 px-10 text-white rounded disabled:bg-blue-300 "
+                className="btn btn-primary px-10 mt-4 disabled:btn-disabled"
                 disabled={isLoading}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
               </button>
             </div>
-
-            {/* Right section more jobs */}
             <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
-              <h2>More jobs from {jobData.companyId.name}</h2>
+              <h2 className="text-lg font-semibold text-base-content">
+                More jobs from {jobData.companyId.name}
+              </h2>
               {jobs
                 .filter(
                   (job) =>
@@ -201,12 +233,9 @@ const ApplyJob = () => {
                     job.companyId._id === jobData.companyId._id
                 )
                 .filter((job) => {
-                  // Set of applied jobIds
                   const appliedJobsId = new Set(
                     userApplications.map((app) => app.jobId && app.jobId._id)
                   );
-
-                  // Return true is the user has not already applied for this job
                   return !appliedJobsId.has(job._id);
                 })
                 .slice(0, 4)
@@ -217,11 +246,10 @@ const ApplyJob = () => {
           </div>
         </div>
       </div>
-
       <Footer />
     </>
   ) : (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-base-100">
       <Loader />
     </div>
   );

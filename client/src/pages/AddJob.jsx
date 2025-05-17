@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Quill from "quill";
+import "quill/dist/quill.snow.css"; // Import Quill styles
 import { JobCategories, JobLocations } from "../assets/assets";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
@@ -41,85 +42,135 @@ const AddJob = () => {
       );
 
       if (data.success) {
-        toast.success("Job added Succesfully");
+        toast.success("Job added successfully", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         setTitle("");
         setSalary(0);
         quillRef.current.root.innerHTML = "";
       } else {
-        toast.error(data.message);
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
   };
 
   useEffect(() => {
-    // Initiate quill only once
-
+    // Initialize Quill only once
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            ["link"],
+            [{ list: "ordered" }, { list: "bullet" }],
+          ],
+        },
       });
+
+      // Apply theme-aware styles to Quill editor
+      const editor = editorRef.current;
+      editor.classList.add(
+        "bg-base-100",
+        "border",
+        "border-base-200",
+        "rounded"
+      );
+      const toolbar = editor.previousSibling;
+      toolbar.classList.add("bg-base-200", "border-b", "border-base-200");
     }
   }, []);
 
   return (
     <form
       onSubmit={onSubmitHandler}
-      className="container p-4 flex flex-col w-full items-start gap-3"
+      className="container p-4 flex flex-col w-full items-start gap-4 bg-base-100 text-base-content"
     >
-      <div className="w-full">
-        <p className="mb-2">Job Title</p>
+      <div className="w-full max-w-lg">
+        <label className="label">
+          <span className="label-text">Job Title</span>
+        </label>
         <input
           type="text"
           placeholder="Type Here"
           onChange={(e) => setTitle(e.target.value)}
           value={title}
           required
-          className="w-full max-w-lg px-3 py2 border-2 border-gray-300 rounded"
+          className="input input-bordered w-full rounded"
         />
       </div>
 
       <div className="w-full max-w-lg">
-        <p className="my-2">Job Description</p>
-
-        <div ref={editorRef}></div>
+        <label className="label">
+          <span className="label-text">Job Description</span>
+        </label>
+        <div ref={editorRef} className="min-h-[200px]"></div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
-        <div>
-          <p className="mb-2">Job Category</p>
+      <div className="flex flex-col sm:flex-row gap-4 w-full sm:gap-8">
+        <div className="w-full sm:w-1/3">
+          <label className="label">
+            <span className="label-text">Job Category</span>
+          </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="select select-bordered w-full rounded"
             onChange={(e) => setCategory(e.target.value)}
+            value={category}
           >
             {JobCategories.map((category, index) => (
-              <option value="category" key={index}>
+              <option value={category} key={index}>
                 {category}
               </option>
             ))}
           </select>
         </div>
 
-        <div>
-          <p className="mb-2">Job Locations</p>
+        <div className="w-full sm:w-1/3">
+          <label className="label">
+            <span className="label-text">Job Location</span>
+          </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="select select-bordered w-full rounded"
             onChange={(e) => setLocation(e.target.value)}
+            value={location}
           >
             {JobLocations.map((location, index) => (
-              <option value="location" key={index}>
+              <option value={location} key={index}>
                 {location}
               </option>
             ))}
           </select>
         </div>
 
-        <div>
-          <p className="mb-2">Job Level</p>
+        <div className="w-full sm:w-1/3">
+          <label className="label">
+            <span className="label-text">Job Level</span>
+          </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="select select-bordered w-full rounded"
             onChange={(e) => setLevel(e.target.value)}
+            value={level}
           >
             <option value="Beginner Level">Beginner Level</option>
             <option value="Intermediate Level">Intermediate Level</option>
@@ -128,18 +179,21 @@ const AddJob = () => {
         </div>
       </div>
 
-      <div>
-        <p className="mb-2">Job Salary</p>
+      <div className="w-full max-w-lg">
+        <label className="label">
+          <span className="label-text">Job Salary</span>
+        </label>
         <input
           min={0}
-          className="w-full px-3 py-2 border-2 border-gray-300  rounded sm:w-[120px]"
+          className="active:outline-none input-bordered outlinno w-full sm:w-32 rounded"
           onChange={(e) => setSalary(e.target.value)}
           type="number"
           placeholder="2500"
+          value={salary}
         />
       </div>
 
-      <button className="w-28 py-3 mt-4  bg-black text-white rounded active:bg-gray-800">
+      <button type="submit" className="btn btn-primary w-28 rounded mt-4">
         Add
       </button>
     </form>

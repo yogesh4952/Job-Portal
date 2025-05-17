@@ -25,16 +25,16 @@ const Applications = () => {
 
   const updateResume = async () => {
     if (!resume) {
-      toast.error("Please select a resume file.");
+      toast.error("Please select a resume file.", {
+        theme: "colored",
+      });
       return;
     }
 
-    console.log("Starting resume update with file:", resume);
     try {
       const formData = new FormData();
       formData.append("resume", resume);
       const token = await getToken();
-      console.log("Sending request with token:", token);
       const { data } = await axios.post(
         backendUrl + "/api/users/update-resume",
         formData,
@@ -44,17 +44,27 @@ const Applications = () => {
           },
         }
       );
-      console.log("Update resume response:", data);
       if (data.success) {
-        toast.success(data.message);
-        console.log("Fetching user data after resume update");
+        toast.success(data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         await fetchUserData();
       } else {
-        toast.error(data.message);
+        toast.error(data.message, {
+          theme: "colored",
+        });
       }
     } catch (error) {
-      console.error("updateResume error:", error);
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
     setIsEdit(false);
     setResume(null);
@@ -69,56 +79,60 @@ const Applications = () => {
   return (
     <>
       <Navbar />
-      <div className="container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10">
-        <h2 className="text-xl font-semibold">Your Resume</h2>
+      <div className="container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10 bg-base-100 text-base-content">
+        <h2 className="text-xl font-semibold mb-4">Your Resume</h2>
         {isLoadingUserData ? (
-          <p>Loading resume...</p>
+          <p className="text-base-content/80">Loading resume...</p>
         ) : userData ? (
-          <div className="flex gap-2 mb-6 mt-3">
+          <div className="flex flex-wrap gap-4 mb-6 mt-3">
             {isEdit || !userData.resume ? (
               <>
                 <label className="flex items-center" htmlFor="resumeUpload">
-                  <p className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2 border border-blue-200">
+                  <span className="bg-primary/10 text-primary px-4 py-2 rounded-lg mr-2 border border-primary/20">
                     {resume ? resume.name : "Select Resume"}
-                  </p>
+                  </span>
                   <input
                     onChange={(e) => {
                       const file = e.target.files[0];
                       if (file && file.type === "application/pdf") {
-                        console.log("Selected file:", file);
                         setResume(file);
                       } else {
-                        toast.error("Please select a valid PDF file.");
+                        toast.error("Please select a valid PDF file.", {
+                          theme: "colored",
+                        });
                       }
                     }}
                     accept="application/pdf"
                     type="file"
                     hidden
-                    name=""
                     id="resumeUpload"
                   />
-                  <img src={assets.profile_upload_icon} alt="Upload icon" />
+                  <img
+                    src={assets.profile_upload_icon}
+                    alt="Upload resume"
+                    className="w-6 h-6"
+                  />
                 </label>
                 <button
                   onClick={updateResume}
-                  className="bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-300 hover:border-green-400 transition"
+                  className="btn btn-success btn-sm"
                 >
                   Save
                 </button>
               </>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-4">
                 <a
-                  className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 hover:border-blue-300 transition"
+                  className="btn btn-primary btn-sm"
                   href={userData.resume}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Resume
+                  View Resume
                 </a>
                 <button
                   onClick={() => setIsEdit(true)}
-                  className="text-gray-500 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition"
+                  className="btn btn-outline btn-sm"
                 >
                   Edit
                 </button>
@@ -127,10 +141,10 @@ const Applications = () => {
           </div>
         ) : (
           <div>
-            <p className="text-red-600">Failed to load resume data.</p>
+            <p className="text-error">Failed to load resume data.</p>
             <button
               onClick={fetchUserData}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg mt-2"
+              className="btn btn-primary btn-sm mt-2"
             >
               Retry
             </button>
@@ -138,73 +152,70 @@ const Applications = () => {
         )}
 
         <h2 className="text-xl font-semibold mb-4">Jobs Applied</h2>
-        <table className="min-w-full bg-white border border-gray-100 rounded-lg shadow-sm">
-          <thead>
-            <tr>
-              <th className="py-3 px-4 border-b border-gray-100 text-left">
-                Company
-              </th>
-              <th className="py-3 px-4 border-b border-gray-100 text-left">
-                Job Title
-              </th>
-              <th className="py-3 px-4 border-b border-gray-100 text-left max-sm:hidden">
-                Location
-              </th>
-              <th className="py-3 px-4 border-b border-gray-100 text-left max-sm:hidden">
-                Date
-              </th>
-              <th className="py-3 px-4 border-b border-gray-100 text-left">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {userApplications.length > 0 ? (
-              userApplications.map((job, index) => (
-                <tr key={index}>
-                  <td className="py-2 px-4 border-b border-gray-100 align-middle">
-                    <div className="flex items-center gap-2">
-                      <img
-                        className="w-8 h-8"
-                        src={job.companyId.image}
-                        alt={`${job.companyId.name} logo`}
-                      />
-                      <span>{job.companyId.name}</span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100 align-middle">
-                    {job.jobId.title}
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100 max-sm:hidden align-middle">
-                    {job.jobId.location}
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100 max-sm:hidden align-middle">
-                    {moment(job.date).format("ll")}
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100 align-middle">
-                    <span
-                      className={`${
-                        job.status === "Accepted"
-                          ? "bg-green-100 text-green-700 border border-green-200"
-                          : job.status === "Rejected"
-                          ? "bg-red-100 text-red-700 border border-red-200"
-                          : "bg-blue-100 text-blue-700 border border-blue-200"
-                      } px-4 py-1.5 rounded`}
-                    >
-                      {job.status}
-                    </span>
+        <div className="overflow-x-auto">
+          <table className="table w-full border border-base-200 rounded-lg shadow-sm">
+            <thead>
+              <tr>
+                <th className="py-3 px-4 text-left">Company</th>
+                <th className="py-3 px-4 text-left">Job Title</th>
+                <th className="py-3 px-4 text-left max-sm:hidden">Location</th>
+                <th className="py-3 px-4 text-left max-sm:hidden">Date</th>
+                <th className="py-3 px-4 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userApplications.length > 0 ? (
+                userApplications.map((job, index) => (
+                  <tr key={index}>
+                    <td className="py-2 px-4 align-middle">
+                      <div className="flex items-center gap-2">
+                        <img
+                          className="w-8 h-8 rounded"
+                          src={job.companyId.image}
+                          alt={`${job.companyId.name} logo`}
+                        />
+                        <span className="text-base-content">
+                          {job.companyId.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2 px-4 align-middle text-base-content">
+                      {job.jobId.title}
+                    </td>
+                    <td className="py-2 px-4 max-sm:hidden align-middle text-base-content">
+                      {job.jobId.location}
+                    </td>
+                    <td className="py-2 px-4 max-sm:hidden align-middle text-base-content">
+                      {moment(job.date).format("ll")}
+                    </td>
+                    <td className="py-2 px-4 align-middle">
+                      <span
+                        className={`badge ${
+                          job.status === "Accepted"
+                            ? "badge-success"
+                            : job.status === "Rejected"
+                            ? "badge-error"
+                            : "badge-info"
+                        } px-4 py-3 rounded`}
+                      >
+                        {job.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="py-4 px-4 text-center text-base-content/80"
+                  >
+                    No applications found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                  No applications found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
       <Footer />
     </>

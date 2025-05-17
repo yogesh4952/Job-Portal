@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { manageJobsData } from "../assets/assets";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -9,12 +8,8 @@ import Loader from "../components/Loader";
 
 const ManageJob = () => {
   const navigate = useNavigate();
-
   const [jobs, setJobs] = useState(false);
-
   const { backendUrl, companyToken } = useContext(AppContext);
-
-  // Function to fetch company Job Application data
 
   const fetchCompanyJobs = async () => {
     try {
@@ -27,22 +22,22 @@ const ManageJob = () => {
       if (data.success) {
         setJobs(data.jobsData.reverse());
       } else {
-        toast.error(data.message);
+        toast.error(data.message, {
+          theme: "colored",
+        });
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
   };
-
-  // Function to change job visibility
 
   const changeJobVisibility = async (id) => {
     try {
       const { data } = await axios.post(
         backendUrl + "/api/company/change-visibility",
-        {
-          id,
-        },
+        { id },
         {
           headers: {
             token: companyToken,
@@ -51,13 +46,26 @@ const ManageJob = () => {
       );
 
       if (data.success) {
-        toast.success(data.success);
+        toast.success(data.message || "Visibility updated successfully", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         fetchCompanyJobs();
       } else {
-        toast.error(data.message);
+        toast.error(data.message, {
+          theme: "colored",
+        });
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
   };
 
@@ -69,52 +77,48 @@ const ManageJob = () => {
 
   return jobs ? (
     jobs.length === 0 ? (
-      <div className="flex items-center justify-center h-[70vh]">
-        <p className="text-xl sm:text-2xl">No Jobs Available or posted</p>
+      <div className="flex items-center justify-center h-[70vh] bg-base-100 text-base-content">
+        <p className="text-xl sm:text-2xl text-base-content/80">
+          No jobs available or posted
+        </p>
       </div>
     ) : (
-      <div className="container p-4 max-w-5xl">
+      <div className="container p-4 max-w-5xl mx-auto bg-base-100 text-base-content">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 max-sm:text-sm">
+          <table className="table w-full border border-base-200 rounded-lg shadow-sm">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b text-left max-sm:hidden">
-                  #
-                </th>
-                <th className="py-2 px-4 border-b text-left">Job Title</th>
-                <th className="py-2 px-4 border-b text-left  max-sm:hidden">
-                  Date
-                </th>
-                <th className="py-2 px-4 border-b text-left  max-sm:hidden">
-                  Locatiobns
-                </th>
-                <th className="py-2 px-4 border-b text-center">Applicants</th>
-                <th className="py-2 px-4 border-b text-left">Visible</th>
+                <th className="py-3 px-4 text-left max-sm:hidden">#</th>
+                <th className="py-3 px-4 text-left">Job Title</th>
+                <th className="py-3 px-4 text-left max-sm:hidden">Date</th>
+                <th className="py-3 px-4 text-left max-sm:hidden">Location</th>
+                <th className="py-3 px-4 text-center">Applicants</th>
+                <th className="py-3 px-4 text-left">Visible</th>
               </tr>
             </thead>
-
             <tbody>
               {jobs.map((job, index) => (
-                <tr key={index} className="text-gray-700 ">
-                  <td className="py-2 px-4 border-b max-sm:hidden">
+                <tr key={index} className="text-base-content">
+                  <td className="py-2 px-4 align-middle max-sm:hidden">
                     {index + 1}
                   </td>
-                  <td className="py-2 px-4 border-b">{job.title}</td>
-                  <td className="py-2 px-4 border-b max-sm:hidden">
+                  <td className="py-2 px-4 align-middle">{job.title}</td>
+                  <td className="py-2 px-4 align-middle max-sm:hidden">
                     {moment(job.date).format("ll")}
                   </td>
-                  <td className="py-2 px-4 border-b max-sm:hidden">
+                  <td className="py-2 px-4 align-middle max-sm:hidden">
                     {job.location}
                   </td>
-                  <td className="py-2 px-4 border-b text-center">
+                  <td className="py-2 px-4 align-middle text-center">
                     {job.applicants}
                   </td>
-                  <td className="py-2 px-4 border-b">
+                  <td className="py-2 px-4 align-middle">
                     <input
-                      className="scale-125 ml-4"
+                      className="checkbox checkbox-primary"
                       type="checkbox"
                       checked={job.visible}
                       onChange={() => changeJobVisibility(job._id)}
+                      aria-label={`Toggle visibility for ${job.title}`}
                     />
                   </td>
                 </tr>
@@ -126,9 +130,9 @@ const ManageJob = () => {
         <div className="mt-4 flex justify-end">
           <button
             onClick={() => navigate("/dashboard/add-job")}
-            className="bg-black text-white py-2 px-4 rounded"
+            className="btn btn-primary btn-sm"
           >
-            Add new job
+            Add New Job
           </button>
         </div>
       </div>

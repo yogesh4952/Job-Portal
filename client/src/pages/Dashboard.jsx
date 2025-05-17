@@ -1,36 +1,49 @@
-import React, { useContext, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useRef } from "react"; // Added useRef
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
+  const location = useLocation(); // Added to check current route
+  const hasRedirected = useRef(false); // Added to prevent repeated redirects
   const { companyData, setCompanyData, setCompanyToken } =
     useContext(AppContext);
-
-  // Function to logout for company
 
   const logout = () => {
     setCompanyToken(null);
     localStorage.removeItem("companyToken");
     setCompanyData(null);
     navigate("/");
-    toast.success("Logout succesfully");
+    toast.success("Logged out successfully", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   useEffect(() => {
-    if (companyData) {
+    if (
+      companyData &&
+      !hasRedirected.current &&
+      location.pathname === "/dashboard"
+    ) {
+      hasRedirected.current = true; // Mark as redirected
       navigate("/dashboard/manage-jobs");
     }
-  }, [companyData]);
+  }, [companyData, navigate, location.pathname]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-base-100 text-base-content">
       {/* Navbar for recruiter panel */}
-      <div className="shadow py-4">
-        <div className="px-5 flex justify-between items-center">
+      <div className="shadow-sm py-4 bg-base-200">
+        <div className="container px-5 mx-auto flex justify-between items-center">
           <img
             onClick={() => navigate("/")}
             className="max-sm:w-32 cursor-pointer"
@@ -40,20 +53,24 @@ const Dashboard = () => {
 
           {companyData && (
             <div className="flex items-center gap-3">
-              <p className="max-sm:hidden">Welcome, {companyData.name}</p>
+              <p className="max-sm:hidden text-base-content">
+                Welcome, {companyData.name}
+              </p>
               <div className="relative group">
                 <img
-                  className="w-8 border border-gray-100 rounded-full"
+                  className="w-8 h-8 rounded-full border border-base-200"
                   src={companyData.image}
-                  alt="User Profile"
+                  alt={`${companyData.name} Profile`}
                 />
-                <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
-                  <ul className="list-none m-0 p-2 bg-white rounded-md border border-gray-400 text-sm">
-                    <li
-                      onClick={logout}
-                      className="py-1 px-2 cursor-pointer pr-10"
-                    >
-                      Logout
+                <div className="absolute hidden group-hover:block top-0 right-0 z-10 rounded pt-12">
+                  <ul className="menu bg-base-100 rounded-md border border-base-200 p-2 text-sm shadow-md">
+                    <li>
+                      <button
+                        onClick={logout}
+                        className="py-1 px-2 hover:bg-base-200"
+                      >
+                        Logout
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -65,20 +82,18 @@ const Dashboard = () => {
 
       <div className="flex items-start">
         {/* Left sidebar with options */}
-        <div className=" min-h-screen border-r border-gray-300">
-          <ul className="flex flex-col items-start pt-5 text-gray-800 mt-4">
+        <div className="min-h-screen border-r border-base-200 w-64 sm:w-72">
+          <ul className="flex flex-col items-start pt-5 text-base-content mt-4">
             <NavLink
               className={({ isActive }) =>
-                `flex items-center py-3 px-4 gap-3 w-full hover:bg-gray-50 transition-colors duration-200 ${
-                  isActive
-                    ? "bg-blue-100 border-r-3 border-blue-500 rounded-l-md"
-                    : ""
+                `flex items-center py-3 px-4 gap-3 w-full hover:bg-base-200 transition-colors duration-200 ${
+                  isActive ? "bg-primary/10 border-r-4 border-primary" : ""
                 }`
               }
               to="/dashboard/add-job"
             >
               <img
-                className="min-w-4"
+                className="w-5 h-5"
                 src={assets.add_icon}
                 alt="Add Job Icon"
               />
@@ -87,16 +102,14 @@ const Dashboard = () => {
 
             <NavLink
               className={({ isActive }) =>
-                `flex items-center py-3 px-4 gap-3 w-full hover:bg-gray-50 transition-colors duration-200 ${
-                  isActive
-                    ? "bg-blue-100 border-r-3 border-blue-500 rounded-l-md"
-                    : ""
+                `flex items-center py-3 px-4 gap-3 w-full hover:bg-base-200 transition-colors duration-200 ${
+                  isActive ? "bg-primary/10 border-r-4 border-primary" : ""
                 }`
               }
               to="/dashboard/manage-jobs"
             >
               <img
-                className="min-w-4"
+                className="w-5 h-5"
                 src={assets.home_icon}
                 alt="Manage Jobs Icon"
               />
@@ -105,16 +118,14 @@ const Dashboard = () => {
 
             <NavLink
               className={({ isActive }) =>
-                `flex items-center py-3 px-4 gap-3 w-full hover:bg-gray-50 transition-colors duration-200 ${
-                  isActive
-                    ? "bg-blue-100 border-r-3 border-blue-500 rounded-l-md"
-                    : ""
+                `flex items-center py-3 px-4 gap-3 w-full hover:bg-base-200 transition-colors duration-200 ${
+                  isActive ? "bg-primary/10 border-r-4 border-primary" : ""
                 }`
               }
               to="/dashboard/view-applications"
             >
               <img
-                className="min-w-4"
+                className="w-5 h-5"
                 src={assets.person_tick_icon}
                 alt="View Applications Icon"
               />
@@ -123,7 +134,7 @@ const Dashboard = () => {
           </ul>
         </div>
 
-        <div className="flex-1 sm:p-5 h-full p-2 ">
+        <div className="flex-1 p-2 sm:p-5">
           <Outlet />
         </div>
       </div>

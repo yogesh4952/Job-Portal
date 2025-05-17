@@ -12,19 +12,11 @@ const RecruiterLogin = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-
   const [image, setImage] = useState(false);
-
   const [isTextDataSubmited, setIsTextDataSubmited] = useState(false);
 
-  console.log();
-  const {
-    setShowRecruiterLogin,
-    backendUrl,
-    setCompanyToken,
-    setCompanyData,
-    companyData,
-  } = useContext(AppContext);
+  const { setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData } =
+    useContext(AppContext);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -40,12 +32,11 @@ const RecruiterLogin = () => {
         });
 
         if (data.success) {
-          console.log(data);
           setCompanyData(data.company);
           setCompanyToken(data.token);
           localStorage.setItem("companyToken", data.token);
           setShowRecruiterLogin(false);
-          toast.success("Login Succesfully");
+          toast.success("Login Successfully");
           navigate("/dashboard");
         } else {
           toast.error(data.message, {
@@ -56,7 +47,7 @@ const RecruiterLogin = () => {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: "light",
+            theme: "colored", // Updated to match theme dynamically
           });
         }
       } else {
@@ -72,12 +63,11 @@ const RecruiterLogin = () => {
         );
 
         if (data.success) {
-          console.log(data);
           setCompanyData(data.company);
           setCompanyToken(data.token);
           localStorage.setItem("companyToken", data.token);
           setShowRecruiterLogin(false);
-          toast.success("SignUp Succesfully");
+          toast.success("Sign Up Successfully");
           navigate("/dashboard");
         } else {
           toast.error(data.message, {
@@ -88,62 +78,67 @@ const RecruiterLogin = () => {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: "light",
+            theme: "colored",
           });
         }
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, {
+        theme: "colored",
+      });
     }
   };
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = "unset";
     };
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
+    <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-base-100/30 flex justify-center items-center">
       <form
         onSubmit={onSubmitHandler}
-        className="relative bg-white p-10 rounded-xl text-slate-500"
+        className="relative card bg-base-100 p-6 sm:p-10 rounded-xl shadow-lg max-w-md w-full"
       >
-        <h1 className="text-center text-2xl text-neutral-700 font-medium">
+        <h1 className="text-center text-2xl font-medium text-base-content mb-2">
           Recruiter {state}
         </h1>
-        <p className="text-sm">Welcome back! Please sign in to continue</p>
+        <p className="text-sm text-base-content/80 text-center mb-6">
+          Welcome back! Please sign in to continue
+        </p>
 
         {state === "Sign Up" && isTextDataSubmited ? (
-          <>
-            <div className="flex items-center gap-4 my-10">
-              <label htmlFor="image">
-                <img
-                  className="w-16 rounded-full"
-                  src={image ? URL.createObjectURL(image) : assets.upload_area}
-                />
-                <input
-                  onChange={(e) => setImage(e.target.files[0])}
-                  type="file"
-                  hidden
-                  id="image"
-                />
-              </label>
-
-              <p>
-                Upload Company <br /> logo
-              </p>
-            </div>
-          </>
+          <div className="flex items-center gap-4 my-6">
+            <label htmlFor="image" className="cursor-pointer">
+              <img
+                className="w-16 rounded-full border border-base-200"
+                src={image ? URL.createObjectURL(image) : assets.upload_area}
+                alt="Company Logo"
+              />
+              <input
+                onChange={(e) => setImage(e.target.files[0])}
+                type="file"
+                hidden
+                id="image"
+              />
+            </label>
+            <p className="text-base-content/80">
+              Upload Company <br /> Logo
+            </p>
+          </div>
         ) : (
           <>
             {state !== "Login" && (
-              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.person_icon} alt="" />
+              <div className="input input-bordered flex items-center gap-2 rounded-full mt-5">
+                <img
+                  src={assets.person_icon}
+                  alt="Company Name"
+                  className="w-5 h-5"
+                />
                 <input
-                  className="outline-none text-sm "
+                  className="grow outline-none text-sm text-base-content"
                   type="text"
                   onChange={(e) => setName(e.target.value)}
                   value={name}
@@ -153,10 +148,10 @@ const RecruiterLogin = () => {
               </div>
             )}
 
-            <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.email_icon} alt="" />
+            <div className="input input-bordered flex items-center gap-2 rounded-full mt-5">
+              <img src={assets.email_icon} alt="Email" className="w-5 h-5" />
               <input
-                className="outline-none text-sm "
+                className="grow outline-none text-sm text-base-content"
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
@@ -165,10 +160,10 @@ const RecruiterLogin = () => {
               />
             </div>
 
-            <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.lock_icon} alt="" />
+            <div className="input input-bordered flex items-center gap-2 rounded-full mt-5">
+              <img src={assets.lock_icon} alt="Password" className="w-5 h-5" />
               <input
-                className="outline-none text-sm "
+                className="grow outline-none text-sm text-base-content"
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
@@ -180,38 +175,38 @@ const RecruiterLogin = () => {
         )}
 
         {state === "Login" && (
-          <p className=" text-sm text-blue-600 mt-4 cursor-pointer">
+          <p className="text-sm text-primary mt-4 cursor-pointer hover:underline">
             Forgot Password
           </p>
         )}
 
         <button
           type="submit"
-          className="bg-blue-600 w-full text-white py-2 rounded-full mt-4"
+          className="btn btn-primary w-full rounded-full mt-4"
         >
           {state === "Login"
-            ? "login"
+            ? "Login"
             : isTextDataSubmited
-            ? "create account"
-            : "next"}
+            ? "Create Account"
+            : "Next"}
         </button>
 
         {state === "Login" ? (
-          <p className="mt-5 text-center">
+          <p className="mt-5 text-center text-sm text-base-content/80">
             Don't have an account?{" "}
             <span
-              className="cursor-pointer text-blue-600"
-              onClick={(e) => setState("Sign Up")}
+              className="cursor-pointer text-primary hover:underline"
+              onClick={() => setState("Sign Up")}
             >
               Sign Up
             </span>
           </p>
         ) : (
-          <p className="mt-5 text-center">
+          <p className="mt-5 text-center text-sm text-base-content/80">
             Already have an account?{" "}
             <span
-              className="cursor-pointer text-blue-600"
-              onClick={(e) => setState("Login")}
+              className="cursor-pointer text-primary hover:underline"
+              onClick={() => setState("Login")}
             >
               Login
             </span>
@@ -220,8 +215,9 @@ const RecruiterLogin = () => {
 
         <img
           src={assets.cross_icon}
-          onClick={(e) => setShowRecruiterLogin(false)}
-          className="absolute top-5 right-5 cursor-pointer"
+          onClick={() => setShowRecruiterLogin(false)}
+          className="absolute top-4 right-4 cursor-pointer w-5 h-5"
+          alt="Close"
         />
       </form>
     </div>
