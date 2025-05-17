@@ -43,16 +43,22 @@ A full-stack Job Portal application designed to connect job seekers with employe
    - Create a `.env` file in the `server` directory and add the following:
 
      ```env
-     PORT=5000
-     MONGO_URI=your_mongodb_connection_string
-     JWT_SECRET=your_jwt_secret
+     JWT_SECRET = ""
+     MONGODB_URI=""
+     CLOUDINARY_API_KEY = ""
+     CLOUDINARY_SECRET_KEY = ""
+     CLOUDINARY_NAME = ""
+     CLERK_PUBLISHABLE_KEY=""
+     CLERK_SECRET_KEY=""
+     CLERK_WEBHOOK_SECRET = ""
+
      ```
 
-   - Start the backend server:
+- Start the backend server:
 
-     ```bash
-     npm start
-     ```
+  ```bash
+  npm run server
+  ```
 
 3. **Setup Frontend**:
 
@@ -64,18 +70,20 @@ A full-stack Job Portal application designed to connect job seekers with employe
    - Create a `.env` file in the `client` directory and add the following:
 
      ```env
-     REACT_APP_API_URL=http://localhost:5000
+     VITE_CLERK_PUBLISHABLE_KEY=""
+     VITE_BACKEND_URL = http://localhost:5000
+     VITE_CLERK_SECRET_KEY=""
      ```
 
    - Start the frontend development server:
 
      ```bash
-     npm start
+     npm run dev
      ```
 
 4. **Access the Application**:
 
-   Open your browser and navigate to `http://localhost:3000` to use the Job Portal.
+   Open your browser and navigate to `http://localhost:5173` to use the Job Portal.
 
 ## Deployment
 
