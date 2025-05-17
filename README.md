@@ -100,3 +100,15 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ## License
 
 This project is open-source and available under the [MIT License](LICENSE).
+
+Contact
+
+For questions or feedback, reach out via:
+
+    GitHub Issues: your-username/yogesh/issues
+
+    Email: your-email@example.com
+
+    Social Media: Facebook | Twitter | Instagram
+
+Built with ❤️ by Yogesh.dev
