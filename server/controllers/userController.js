@@ -1,22 +1,51 @@
-import Job from "../models/Job.js";
-import JobApplication from "../models/JobApplication.js";
-import User from "../models/User.js";
-import { v2 as cloudinary } from "cloudinary";
-import mongoose from "mongoose";
+import Job from '../models/Job.js';
+import JobApplication from '../models/JobApplication.js';
+import User from '../models/User.js';
+import { v2 as cloudinary } from 'cloudinary';
+import mongoose from 'mongoose';
+import { createClerkClient } from '@clerk/clerk-sdk-node';
+
+// Initialize Clerk client lazily to ensure env variables are loaded
+let clerk = null;
+
+const getClerkClient = () => {
+  if (!clerk) {
+    clerk = createClerkClient({ apiKey: process.env.CLERK_SECRET_KEY });
+  }
+  return clerk;
+};
 
 // Get user data
 export const getUserData = async (req, res) => {
-  // const userId = req.auth.userId;
-  const { userId } = req.headers;
+  const userId = req.auth.userId;
 
   try {
-    const user = await User.findOne(userId);
+    let user = await User.findById(userId);
 
     if (!user) {
-      return res.json({
-        success: false,
-        message: "User not found ",
+      // Fetch user data from Clerk
+      const clerkClient = getClerkClient();
+      const clerkUser = await clerkClient.users.getUser(userId);
+      if (!clerkUser) {
+        return res.json({
+          success: false,
+          message: 'User not found in Clerk',
+        });
+      }
+
+      // Create new user
+      user = new User({
+        _id: userId,
+        email:
+          clerkUser.emailAddresses?.[0]?.emailAddress ||
+          `user_${userId}@example.com`,
+        name:
+          `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() ||
+          'Unknown User',
+        image: clerkUser.imageUrl || 'https://via.placeholder.com/150',
+        resume: '',
       });
+      await user.save();
     }
 
     res.json({
@@ -39,10 +68,10 @@ export const applyForJob = async (req, res) => {
   if (!jobId) {
     return res
       .status(400)
-      .json({ success: false, message: "Job ID is required" });
+      .json({ success: false, message: 'Job ID is required' });
   }
   if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return res.status(400).json({ success: false, message: "Invalid Job ID" });
+    return res.status(400).json({ success: false, message: 'Invalid Job ID' });
   }
 
   try {
@@ -51,7 +80,7 @@ export const applyForJob = async (req, res) => {
     if (alreadyApplied) {
       return res.status(400).json({
         success: false,
-        message: "You have already applied for this job.",
+        message: 'You have already applied for this job.',
       });
     }
 
@@ -60,7 +89,7 @@ export const applyForJob = async (req, res) => {
     if (!jobData) {
       return res
         .status(404)
-        .json({ success: false, message: "Job not found." });
+        .json({ success: false, message: 'Job not found.' });
     }
 
     // Create job application
@@ -73,13 +102,13 @@ export const applyForJob = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Applied successfully.",
+      message: 'Applied successfully.',
     });
   } catch (error) {
-    console.error("Apply Job Error:", error);
+    console.error('Apply Job Error:', error);
     res.status(500).json({
       success: false,
-      message: error.message || "Server error",
+      message: error.message || 'Server error',
     });
   }
 };
@@ -90,14 +119,14 @@ export const getUserJobApplications = async (req, res) => {
     const userId = req.auth.userId;
 
     const applications = await JobApplication.find({ userId })
-      .populate("companyId", "name email image")
-      .populate("jobId", "title description location category level salary")
+      .populate('companyId', 'name email image')
+      .populate('jobId', 'title description location category level salary')
       .exec();
 
     if (!applications) {
       return res.json({
         success: false,
-        message: "No Job applications found for this user",
+        message: 'No Job applications found for this user',
       });
     }
 
@@ -115,30 +144,27 @@ export const getUserJobApplications = async (req, res) => {
 
 // Update user profile (resume)
 
-import { Clerk } from "@clerk/clerk-sdk-node";
-
-const clerk = new Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
-
 export const updateUserResume = async (req, res) => {
   try {
     const userId = req.auth.userId; // Clerk user ID
-    console.log("Updating resume for userId:", userId);
+    console.log('Updating resume for userId:', userId);
 
     const resumeFile = req.file;
-    console.log("Resume file:", resumeFile);
+    console.log('Resume file:', resumeFile);
 
     // Find user by _id (Clerk user ID)
     let userData = await User.findById(userId);
     if (!userData) {
-      console.log("Creating new user for userId:", userId);
+      console.log('Creating new user for userId:', userId);
 
       // Fetch user data from Clerk
-      const clerkUser = await clerk.users.getUser(userId);
+      const clerkClient = getClerkClient();
+      const clerkUser = await clerkClient.users.getUser(userId);
       if (!clerkUser) {
-        console.error("Clerk user not found:", userId);
+        console.error('Clerk user not found:', userId);
         return res.status(404).json({
           success: false,
-          message: "Clerk user not found",
+          message: 'Clerk user not found',
         });
       }
 
@@ -148,41 +174,41 @@ export const updateUserResume = async (req, res) => {
           clerkUser.emailAddresses?.[0]?.emailAddress ||
           `user_${userId}@example.com`,
         name:
-          `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() ||
-          "Unknown User",
-        image: clerkUser.imageUrl || "https://via.placeholder.com/150", // Use Clerk image or fallback
-        resume: "",
+          `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() ||
+          'Unknown User',
+        image: clerkUser.imageUrl || 'https://via.placeholder.com/150', // Use Clerk image or fallback
+        resume: '',
       });
       await userData.save();
-      console.log("New user created:", userData);
+      console.log('New user created:', userData);
     }
 
     if (!resumeFile) {
-      console.error("No resume file provided");
+      console.error('No resume file provided');
       return res.status(400).json({
         success: false,
-        message: "No resume file provided",
+        message: 'No resume file provided',
       });
     }
 
     // Upload resume to Cloudinary
     const resumeUpload = await cloudinary.uploader.upload(resumeFile.path, {
-      folder: "resumes",
+      folder: 'resumes',
     });
-    console.log("Cloudinary upload result:", resumeUpload);
+    console.log('Cloudinary upload result:', resumeUpload);
 
     // Update user's resume field
     userData.resume = resumeUpload.secure_url;
     await userData.save();
 
-    console.log("User updated successfully:", userData);
+    console.log('User updated successfully:', userData);
 
     return res.json({
       success: true,
-      message: "Resume updated successfully",
+      message: 'Resume updated successfully',
     });
   } catch (error) {
-    console.error("Error in updateUserResume:", error);
+    console.error('Error in updateUserResume:', error);
     return res.status(500).json({
       success: false,
       message: error.message,

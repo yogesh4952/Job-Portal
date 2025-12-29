@@ -1,12 +1,12 @@
-import { requestDataIntegration } from "@sentry/node";
-import Job from "../models/Job.js";
+import { requestDataIntegration } from '@sentry/node';
+import Job from '../models/Job.js';
 
 // Get all jobs
 export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ visible: true }).populate({
-      path: "companyId",
-      select: "-password",
+      path: 'companyId',
+      select: '-password',
     });
 
     res.json({
@@ -29,19 +29,19 @@ export const getJobById = async (req, res) => {
     if (!id) {
       return res.json({
         success: false,
-        messgae: " Job id not found",
+        message: ' Job id not found',
       });
     }
 
     const job = await Job.findById(id).populate({
-      path: "companyId",
-      select: "-password",
+      path: 'companyId',
+      select: '-password',
     });
 
     if (!job) {
       return res.json({
         success: false,
-        meesgae: "Job not found",
+        message: 'Job not found',
       });
     }
 

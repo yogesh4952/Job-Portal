@@ -1,11 +1,9 @@
-import Company from "../models/Company.js";
-import bcrypt from "bcrypt";
-import generateToken from "../utils/generateToken.js";
-import { v2 as cloudinary } from "cloudinary";
-import Job from "../models/Job.js";
-import { extractQueryParamsFromUrl } from "@sentry/core";
-
-import JobApplication from "../models/JobApplication.js";
+import Company from '../models/Company.js';
+import bcrypt from 'bcrypt';
+import generateToken from '../utils/generateToken.js';
+import { v2 as cloudinary } from 'cloudinary';
+import Job from '../models/Job.js';
+import JobApplication from '../models/JobApplication.js';
 
 // Register a new company
 export const registerCompany = async (req, res) => {
@@ -14,7 +12,7 @@ export const registerCompany = async (req, res) => {
   const imageFile = req.file;
 
   if (!name || !email || !password || !imageFile) {
-    return res.json({ success: false, message: " Missing Details" });
+    return res.json({ success: false, message: ' Missing Details' });
   }
 
   try {
@@ -23,7 +21,7 @@ export const registerCompany = async (req, res) => {
     if (companyExists) {
       return res.json({
         success: false,
-        message: "Company email already exist",
+        message: 'Company email already exist',
       });
     }
 
@@ -67,7 +65,7 @@ export const loginCompany = async (req, res) => {
     if (!company) {
       return res.json({
         success: false,
-        message: "Invalid email or password",
+        message: 'Invalid email or password',
       });
     }
 
@@ -87,7 +85,7 @@ export const loginCompany = async (req, res) => {
     } else {
       return res.json({
         success: false,
-        message: "Invalid email or password",
+        message: 'Invalid email or password',
       });
     }
   } catch (error) {
@@ -157,8 +155,8 @@ export const getCompanyJobApplicants = async (req, res) => {
     // Find job applicatiobs for the user and populate related data
 
     const applications = await JobApplication.find({ companyId })
-      .populate("userId", "name image resume")
-      .populate("jobId", "title location category level salary")
+      .populate('userId', 'name image resume')
+      .populate('jobId', 'title location category level salary')
       .exec();
 
     return res.json({ success: true, applications });
@@ -191,7 +189,7 @@ export const getCompanyPostedJobs = async (req, res) => {
   } catch (error) {
     res.json({
       success: false,
-      messgae: error.message,
+      message: error.message,
     });
   }
 };
@@ -206,7 +204,7 @@ export const ChangeJobApplicationsStatus = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Status Changed",
+      message: 'Status Changed',
     });
   } catch (error) {
     res.json({

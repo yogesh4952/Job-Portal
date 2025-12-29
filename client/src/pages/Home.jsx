@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "../components/Navbar";
-import Hero from "../components/Hero";
-import JobListing from "../components/JobListing";
-import AppDownload from "../components/AppDownload";
-import Footer from "../components/Footer";
+import Navbar from "../Components/Navbar";
+import Hero from "../Components/Hero";
+import JobListing from "../Components/JobListing";
+import AppDownload from "../Components/AppDownload";
+import Footer from "../Components/Footer";
 
 const Home = () => {
   return (

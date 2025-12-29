@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../Components/Navbar";
 import moment from "moment";
 import { assets } from "../assets/assets";
-import Footer from "../components/Footer";
+import Footer from "../Components/Footer";
 import { AppContext } from "../context/AppContext";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import axios from "axios";
