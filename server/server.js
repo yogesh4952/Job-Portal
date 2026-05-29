@@ -17,8 +17,21 @@ import { clerkMiddleware } from "@clerk/express";
 const app = express();
 
 // Connect to database
-await connectDB();
-await connectCloudinary();
+try {
+  await connectDB();
+} catch (error) {
+  console.error("❌ Failed to connect to MongoDB:", error.message);
+  console.error("   Check your MONGODB_URI in .env file");
+  process.exit(1);
+}
+
+try {
+  await connectCloudinary();
+} catch (error) {
+  console.error("❌ Failed to connect to Cloudinary:", error.message);
+  console.error("   Check your CLOUDINARY_* variables in .env file");
+  process.exit(1);
+}
 
 // Middlewares
 app.use(
@@ -40,7 +53,9 @@ app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/users", userRoutes);
 
-Sentry.setupExpressErrorHandler(app);
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 const PORT = process.env.PORT || 5000;
 

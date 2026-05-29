@@ -10,7 +10,7 @@ let clerk = null;
 
 const getClerkClient = () => {
   if (!clerk) {
-    clerk = createClerkClient({ apiKey: process.env.CLERK_SECRET_KEY });
+    clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
   }
   return clerk;
 };

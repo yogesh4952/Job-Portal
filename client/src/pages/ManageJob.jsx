@@ -9,6 +9,7 @@ import Loader from "../Components/Loader";
 const ManageJob = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState(false);
+  const [updatingVisibilityId, setUpdatingVisibilityId] = useState(null);
   const { backendUrl, companyToken } = useContext(AppContext);
 
   const fetchCompanyJobs = async () => {
@@ -35,6 +36,7 @@ const ManageJob = () => {
 
   const changeJobVisibility = async (id) => {
     try {
+      setUpdatingVisibilityId(id);
       const { data } = await axios.post(
         backendUrl + "/api/company/change-visibility",
         { id },
@@ -66,6 +68,8 @@ const ManageJob = () => {
       toast.error(error.message, {
         theme: "colored",
       });
+    } finally {
+      setUpdatingVisibilityId(null);
     }
   };
 
@@ -113,13 +117,17 @@ const ManageJob = () => {
                     {job.applicants}
                   </td>
                   <td className="py-2 px-4 align-middle">
-                    <input
-                      className="checkbox checkbox-primary"
-                      type="checkbox"
-                      checked={job.visible}
-                      onChange={() => changeJobVisibility(job._id)}
-                      aria-label={`Toggle visibility for ${job.title}`}
-                    />
+                    {updatingVisibilityId === job._id ? (
+                      <span className="loading loading-spinner loading-xs text-primary"></span>
+                    ) : (
+                      <input
+                        className="checkbox checkbox-primary"
+                        type="checkbox"
+                        checked={job.visible}
+                        onChange={() => changeJobVisibility(job._id)}
+                        aria-label={`Toggle visibility for ${job.title}`}
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

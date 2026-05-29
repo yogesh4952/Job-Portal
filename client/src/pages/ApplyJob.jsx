@@ -17,6 +17,7 @@ const ApplyJob = () => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
 
   const [jobData, setJobData] = useState(null);
@@ -51,7 +52,7 @@ const ApplyJob = () => {
   };
 
   const applyHandler = async () => {
-    setIsLoading(true);
+    setIsApplying(true);
 
     try {
       if (!userData) {
@@ -107,10 +108,7 @@ const ApplyJob = () => {
           theme: "colored",
         });
       }
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
-
       console.error("Apply Job Error:", {
         message: error.message,
         response: error.response?.data,
@@ -119,6 +117,8 @@ const ApplyJob = () => {
       toast.error(error.response?.data?.message || "Failed to apply for job", {
         theme: "colored",
       });
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -195,10 +195,16 @@ const ApplyJob = () => {
             <div className="flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center">
               <button
                 onClick={applyHandler}
-                className="btn btn-primary px-10 disabled:btn-disabled"
-                disabled={isLoading}
+                className="btn btn-primary px-10 disabled:bg-primary/70 disabled:text-primary-content"
+                disabled={isApplying || isApplied}
               >
-                {isApplied ? "Already Applied" : "Apply Now"}
+                {isApplying ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : isApplied ? (
+                  "Already Applied"
+                ) : (
+                  "Apply Now"
+                )}
               </button>
               <p className="mt-1 text-base-content/80">
                 Posted {moment(jobData.date).fromNow()}
@@ -216,10 +222,16 @@ const ApplyJob = () => {
               ></div>
               <button
                 onClick={applyHandler}
-                className="btn btn-primary px-10 mt-4 disabled:btn-disabled"
-                disabled={isLoading}
+                className="btn btn-primary px-10 mt-4 disabled:bg-primary/70 disabled:text-primary-content"
+                disabled={isApplying || isApplied}
               >
-                {isApplied ? "Already Applied" : "Apply Now"}
+                {isApplying ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : isApplied ? (
+                  "Already Applied"
+                ) : (
+                  "Apply Now"
+                )}
               </button>
             </div>
             <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">

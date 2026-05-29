@@ -12,6 +12,7 @@ const AddJob = () => {
   const [category, setCategory] = useState("Programming");
   const [level, setLevel] = useState("Beginner Level");
   const [salary, setSalary] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
@@ -22,6 +23,7 @@ const AddJob = () => {
     e.preventDefault();
 
     try {
+      setIsSubmitting(true);
       const description = quillRef.current.root.innerHTML;
 
       const { data } = await axios.post(
@@ -71,6 +73,8 @@ const AddJob = () => {
       toast.error(error.message, {
         theme: "colored",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -193,8 +197,12 @@ const AddJob = () => {
         />
       </div>
 
-      <button type="submit" className="btn btn-primary w-28 rounded mt-4">
-        Add
+      <button 
+        type="submit" 
+        disabled={isSubmitting}
+        className="btn btn-primary w-28 rounded mt-4 disabled:bg-primary/70 disabled:text-primary-content"
+      >
+        {isSubmitting ? <span className="loading loading-spinner loading-sm"></span> : "Add"}
       </button>
     </form>
   );

@@ -14,6 +14,7 @@ const RecruiterLogin = () => {
   const [email, setEmail] = useState("");
   const [image, setImage] = useState(false);
   const [isTextDataSubmited, setIsTextDataSubmited] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData } =
     useContext(AppContext);
@@ -25,6 +26,7 @@ const RecruiterLogin = () => {
     }
 
     try {
+      setIsLoading(true);
       if (state === "Login") {
         const { data } = await axios.post(backendUrl + "/api/company/login", {
           email,
@@ -86,6 +88,8 @@ const RecruiterLogin = () => {
       toast.error(error.message, {
         theme: "colored",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -182,13 +186,18 @@ const RecruiterLogin = () => {
 
         <button
           type="submit"
-          className="btn btn-primary w-full rounded-full mt-4"
+          disabled={isLoading}
+          className="btn btn-primary w-full rounded-full mt-4 disabled:bg-primary/70 disabled:text-primary-content"
         >
-          {state === "Login"
-            ? "Login"
-            : isTextDataSubmited
-            ? "Create Account"
-            : "Next"}
+          {isLoading ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : state === "Login" ? (
+            "Login"
+          ) : isTextDataSubmited ? (
+            "Create Account"
+          ) : (
+            "Next"
+          )}
         </button>
 
         {state === "Login" ? (

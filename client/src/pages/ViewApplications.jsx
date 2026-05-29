@@ -8,6 +8,7 @@ import Loader from "../Components/Loader";
 const ViewApplications = () => {
   const { backendUrl, companyToken } = useContext(AppContext);
   const [applicants, setApplicants] = useState(false);
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
   const fetchCompanyJobApplications = async () => {
     try {
@@ -33,6 +34,7 @@ const ViewApplications = () => {
 
   const changeJobApplicationStatus = async (id, status) => {
     try {
+      setUpdatingStatusId(id);
       const { data } = await axios.post(
         backendUrl + "/api/company/change-status",
         { id, status },
@@ -62,6 +64,8 @@ const ViewApplications = () => {
       toast.error(error.message, {
         theme: "colored",
       });
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -144,7 +148,9 @@ const ViewApplications = () => {
                       </a>
                     </td>
                     <td className="py-2 px-4 align-middle">
-                      {applicant.status === "Pending" ? (
+                      {updatingStatusId === applicant._id ? (
+                        <span className="loading loading-spinner loading-xs text-primary"></span>
+                      ) : applicant.status === "Pending" ? (
                         <div className="dropdown dropdown-end">
                           <label tabIndex={0} className="btn btn-ghost btn-xs">
                             <span className="text-base-content">...</span>

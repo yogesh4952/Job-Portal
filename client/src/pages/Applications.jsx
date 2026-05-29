@@ -13,6 +13,7 @@ const Applications = () => {
   const { getToken } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
+  const [isUpdatingResume, setIsUpdatingResume] = useState(false);
 
   const {
     backendUrl,
@@ -32,6 +33,7 @@ const Applications = () => {
     }
 
     try {
+      setIsUpdatingResume(true);
       const formData = new FormData();
       formData.append("resume", resume);
       const token = await getToken();
@@ -65,9 +67,11 @@ const Applications = () => {
       toast.error(error.message, {
         theme: "colored",
       });
+    } finally {
+      setIsUpdatingResume(false);
+      setIsEdit(false);
+      setResume(null);
     }
-    setIsEdit(false);
-    setResume(null);
   };
 
   useEffect(() => {
@@ -115,9 +119,17 @@ const Applications = () => {
                 </label>
                 <button
                   onClick={updateResume}
-                  className="btn btn-success btn-sm"
+                  disabled={isUpdatingResume}
+                  className="btn btn-success btn-sm disabled:bg-success/70 disabled:text-success-content"
                 >
-                  Save
+                  {isUpdatingResume ? (
+                    <>
+                      <span className="loading loading-spinner loading-xs"></span>
+                      Saving
+                    </>
+                  ) : (
+                    "Save"
+                  )}
                 </button>
               </>
             ) : (
